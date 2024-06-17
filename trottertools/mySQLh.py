@@ -5,9 +5,29 @@ This one is for mysql
 """
 
 from querpy import Query
-
+from sqlalchemy import create_engine
+from dotenv import load_dotenv
+from typing import Optional
 
 class SQLh(object):
+
+    
+
+    def __init__(self, username: str | None, password: str | None, database: str | None, host: str | None, port: int | None):
+        # we have 
+        if(username==None):
+            #Then we need to load from the .env if we can find it..
+            load_dotenv()
+            username = os.getenv('MYSQL_USER')
+            password = os.getenv('MYSQL_PASSWD')
+            database = os.getenv('MYSQL_DB')
+            host = os.getenv('MYSQL_HOST','localhost')
+            port = os.getenv('MYSQL_PORT',3306)
+        self._engine = create_engine(f"mysql+pymsql://{username}:{password}@{host}?port={port}/{database}")
+        self._conn = self._engine.connect()
+
+        #if we get here, then we have connected to the database
+
 
     @staticmethod
     def runDictOfQuerys(query_dict,is_just_print = False,is_ignore_exception = False):
