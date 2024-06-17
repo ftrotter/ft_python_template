@@ -3,14 +3,13 @@ mySQLh.py
 A set of SQL helper functions, that is compatible with querpy
 This one is for mysql
 """
-
-from querpy import Query
+import os
 from sqlalchemy import create_engine
 from sqlalchemy import text 
 from dotenv import load_dotenv
 from typing import Optional
 
-class SQLh(object):
+class mySQLh(object):
 
     
     def __init__(self):
@@ -20,14 +19,17 @@ class SQLh(object):
         #have to have these three
         username = os.getenv('MYSQL_USER')
         password = os.getenv('MYSQL_PASSWD')
-        database = os.getenv('MYSQL_DB')
+        database = os.getenv('MYSQL_DATABASE')
 
         #these two have defaults
         host = os.getenv('MYSQL_HOST','localhost')
-        port = os.getenv('MYSQL_PORT',3306)
+        port = int(os.getenv('MYSQL_PORT',3306))
     
-        #use sql alchemy to connect to the database and then keep the connection as an object variable. 
-        self._engine = create_engine(f"mysql+pymsql://{username}:{password}@{host}?port={port}/{database}")
+        #use sql alchemy to connect to the database and then keep the connection as an object variable.
+         
+        conn_string = f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+        print(conn_string)
+        self._engine = create_engine(conn_string)
         self._conn = self._engine.connect()
 
 
