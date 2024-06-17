@@ -6,41 +6,40 @@ This one is for mysql
 
 from querpy import Query
 from sqlalchemy import create_engine
+from sqlalchemy import text 
 from dotenv import load_dotenv
 from typing import Optional
 
 class SQLh(object):
 
     
+    def __init__(self):
+        #we automatically use the .env file to connect to the datase.
+        load_dotenv() # means we will see the .env file as environment variables for os.getenv
 
-    def __init__(self, username: str | None, password: str | None, database: str | None, host: str | None, port: int | None):
-        # we have 
-        if(username==None):
-            #Then we need to load from the .env if we can find it..
-            load_dotenv()
-            username = os.getenv('MYSQL_USER')
-            password = os.getenv('MYSQL_PASSWD')
-            database = os.getenv('MYSQL_DB')
-            host = os.getenv('MYSQL_HOST','localhost')
-            port = os.getenv('MYSQL_PORT',3306)
+        #have to have these three
+        username = os.getenv('MYSQL_USER')
+        password = os.getenv('MYSQL_PASSWD')
+        database = os.getenv('MYSQL_DB')
+
+        #these two have defaults
+        host = os.getenv('MYSQL_HOST','localhost')
+        port = os.getenv('MYSQL_PORT',3306)
+    
+        #use sql alchemy to connect to the database and then keep the connection as an object variable. 
         self._engine = create_engine(f"mysql+pymsql://{username}:{password}@{host}?port={port}/{database}")
         self._conn = self._engine.connect()
 
-        #if we get here, then we have connected to the database
 
-
-    @staticmethod
-    def runDictOfQuerys(query_dict,is_just_print = False,is_ignore_exception = False):
+    def runDictOfQuerys(self,query_dict,is_just_print = False,is_ignore_exception = False):
         #This is just a wrapper for runQuerys
-        SQLh.runQuerys(query_dict,is_just_print,is_ignore_exception)
+        self.runQuerys(query_dict,is_just_print,is_ignore_exception)
 
-    @staticmethod
-    def runListOfQuerys(query_list,is_just_print = False, is_ignore_exception = False):
+    def runListOfQuerys(self,query_list,is_just_print = False, is_ignore_exception = False):
         #This is just a wrapper for runQuerys
-        SQLh.runQuerys(query_list,is_just_print,is_ignore_exception)
+        self.runQuerys(query_list,is_just_print,is_ignore_exception)
 
-    @staticmethod
-    def runQuerys(these_queries,is_just_print = False, is_ignore_exception = False):
+    def runQuerys(self,these_queries,is_just_print = False, is_ignore_exception = False):
         """
         Runs a dictoriary or list of queries against the spark SQL engine
         
@@ -78,13 +77,11 @@ class SQLh(object):
                     #we do nothing, we have already printed
                     print('#not running sql')
                 else:
-                    if(is_first_run): 
-                        # perhaps we connect to database here?
 
                     print('running SQL command')
                     try:
                         #Todo mysql connection
-                        pass
+                        self._conn.execute(text(this_sql))
                     except Exception as error:
                         #no matter what, we print the error!!
                         print(f"SQLh.runQuerys: Error in the SQL loop: \n", error)

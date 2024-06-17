@@ -1,6 +1,4 @@
 
-from mySQLh import mySQLh
-from querpy import Query
 import datetime
 import importlib
 from importlib import util as iutil
